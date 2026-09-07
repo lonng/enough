@@ -10,10 +10,13 @@ macOS 27.0 beta, build 26A5425a, Apple Silicon.
 | --- | --- |
 | Real Documents permission request | Approved through Apple's system dialog; the requesting fixture then read the folder successfully |
 | Desktop and Downloads requests | The development app clicked Allow and recorded closure; each requesting fixture read its folder successfully |
-| Access to another app's data | Matcher implemented; live check pending |
+| Access to another app's data | Experimental. The local fixture returned a permission error without a recorded approval. Not proven |
 | Intel and Apple Silicon release compilation | Passed |
 | Installed app's first window | Visually checked |
 | Request matching | 28 checks, including an app-supplied purpose string that imitates a supported title |
+| Signed installer | Apple notarization, stapling, signatures, universal architecture, and Gatekeeper checks passed on the build runner and this Mac |
+
+The macOS 14.8.9 runner allowed the fixtures to read without showing permission dialogs. That run is inconclusive for automatic approval. The downloadable binary was built from commit `9a57333ab6479f306b4f6bf18200e3f59deed72e`; subsequent release-page changes affect documentation and artwork only.
 
 The development app handled three folder requests launched together. This is not a test of hundreds of queued windows. Later repeat runs included manual interaction and are not counted as automatic approval evidence. The packaged release uses a stricter headline check than the first GUI integration run.
 

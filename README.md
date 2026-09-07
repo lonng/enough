@@ -2,13 +2,17 @@
 
 Automatic approval for macOS file and app-data permission popups.
 
+<a href="https://github.com/jtc268/enough/releases/download/v0.1.0/Enough-0.1.0-universal.dmg"><img src="Assets/download.svg" alt="Download Enough for Mac" width="360" height="88"></a>
+
+**Open the download. Drag Enough into Applications. Open Enough and grant Accessibility access.**
+
 **[Buy me a coffee](https://buymeacoffee.com/refresh1)** · [Compatibility](Docs/compatibility.md) · [MIT license](LICENSE)
 
 ![Enough. A stack of Allow dialogs becomes a single green check.](Assets/banner.png)
 
 A small menu bar app for the hundredth time Python asks for access. Free, open source, and written in Swift.
 
-The first signed release is being prepared. Source builds work now.
+Early release. Signed by Adore LLC and notarized by Apple. macOS 13 or later. The download is 532 KB.
 
 ## Use
 
@@ -16,12 +20,14 @@ The first signed release is being prepared. Source builds work now.
 2. Give Enough **Accessibility** access in System Settings.
 3. Leave it running. Pause or quit from the menu bar.
 
+macOS may show its normal download confirmation on the first open. Enough itself requests only Accessibility. Test fixtures are not included in the app.
+
 Enough clicks **Allow** for supported requests from **any app**. This grants real access to your files and app data. Turn it on only when that is what you want.
 
 ## Scope
 
 - Documents, Desktop, and Downloads folder requests.
-- Requests to access data from other apps.
+- Requests to access data from other apps: experimental, not yet verified in a live approval test.
 - English system dialogs with the exact supported wording and buttons.
 
 It leaves other dialogs alone, including passwords, Touch ID, installers, camera, microphone, screen recording, and network requests. One initial Accessibility grant is required. macOS 13 or later; Intel and Apple Silicon builds. See the [tested versions and limitations](Docs/compatibility.md).
