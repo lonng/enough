@@ -9,11 +9,13 @@ macOS 27.0 beta, build 26A5425a, Apple Silicon.
 | Check | Result |
 | --- | --- |
 | Real Documents permission request | Approved through Apple's system dialog; the requesting fixture then read the folder successfully |
-| Desktop and Downloads requests | Matcher implemented; live checks pending |
+| Desktop and Downloads requests | The development app clicked Allow and recorded closure; each requesting fixture read its folder successfully |
 | Access to another app's data | Matcher implemented; live check pending |
 | Intel and Apple Silicon release compilation | Passed |
 | Installed app's first window | Visually checked |
 | Request matching | 28 checks, including an app-supplied purpose string that imitates a supported title |
+
+The development app handled three folder requests launched together. This is not a test of hundreds of queued windows. Later repeat runs included manual interaction and are not counted as automatic approval evidence. The packaged release uses a stricter headline check than the first GUI integration run.
 
 Only English prompt titles hosted by Apple's signed `com.apple.UserNotificationCenter` process are eligible. A different host, wording, unreadable headline, extra action button, or incomplete Accessibility tree causes the app to leave the request alone. Some protected dialogs may not expose a usable Allow action.
 
