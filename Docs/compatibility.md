@@ -1,0 +1,46 @@
+# Compatibility
+
+Enough v0.1.0 is an early release. Building for an OS version is different from testing it on that version.
+
+## Tested on September 7, 2026
+
+macOS 27.0 beta, build 26A5425a, Apple Silicon.
+
+| Check | Result |
+| --- | --- |
+| Real Documents permission request | Approved through Apple's system dialog; the requesting fixture then read the folder successfully |
+| Desktop and Downloads requests | Matcher implemented; live checks pending |
+| Access to another app's data | Matcher implemented; live check pending |
+| Intel and Apple Silicon release compilation | Passed |
+| Installed app's first window | Visually checked |
+| Request matching | 28 checks, including an app-supplied purpose string that imitates a supported title |
+
+Only English prompt titles hosted by Apple's signed `com.apple.UserNotificationCenter` process are eligible. A different host, wording, unreadable headline, extra action button, or incomplete Accessibility tree causes the app to leave the request alone. Some protected dialogs may not expose a usable Allow action.
+
+The observer disconnects while paused, asleep, locked, or in an inactive user session. It reconnects on session and app events. Lock, sleep, Spaces, multiple displays, Intel hardware, and older macOS versions still need live coverage.
+
+## How much access does it grant?
+
+Allow has the same effect as clicking the button yourself. Enough does not distinguish trusted and untrusted requesting apps. It does not edit the TCC database, disable SIP, grant itself Accessibility, or pre-grant every macOS permission.
+
+For some app-container requests, macOS permission lasts only until the requesting app exits. Enough handles eligible prompts when they recur. Full Disk Access for the correct responsible app can avoid this class of request. [Apple's explanation](https://developer.apple.com/videos/play/wwdc2023/10053/?time=1066).
+
+## Resource use
+
+The early observer prototype used about 10.7 MiB peak resident memory in a 30-second idle run, with CPU time rounded to 0.00 seconds by the timing tool. This is a short prototype measurement, not a finished-app battery benchmark.
+
+Dialog detection uses events. There are bounded delays for coalescing events and verifying closure, plus a temporary Accessibility setup check while the setup window is visible. There is no continuous screen or dialog scan.
+
+## Local activity
+
+The last 500 events are saved in `~/Library/Application Support/Enough/activity.json`. Each includes a timestamp, requesting app name, permission category, and action result. File paths and dialog body text are not recorded.
+
+`Clicked Allow` means the Accessibility action succeeded. `Dialog closed` means the original window disappeared. These do not by themselves prove that an arbitrary requesting app completed its operation. Integration tests separately check the requesting fixture's result.
+
+## Integration fixtures
+
+`Scripts/Fixtures/build.sh OUTPUT_DIRECTORY` builds disposable folder, sandbox-owner, and reader apps. They report only operation success and directory entry counts. The owner writes one test file in its own container; launch it with `--cleanup` to remove that file.
+
+The owner must be Developer ID signed to exercise cross-developer app-container protection reliably. An ad hoc owner and reader can access the fixture without showing a permission dialog, which is not a successful approval test.
+
+The `Enough --probe --requester-prefix "Enough Fixture" --seconds 30` test mode runs the same engine for a bounded interval. `--observe-only` records matches without clicking. It still needs Accessibility trust. Reset only the disposable fixture's permission when repeating a test, never all app permissions.

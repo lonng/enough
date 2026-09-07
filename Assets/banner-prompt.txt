@@ -1,0 +1,9 @@
+Generated with the built-in imagegen tool on September 7, 2026.
+
+Use case: ads-marketing
+Asset type: wide GitHub README banner for a free native macOS utility called Enough.
+Primary request: create a beautiful, concise green identity image about ending an endless stack of permission popups.
+Scene and subject: a crisp graphic poster with a small layered stack of pale permission-dialog cards, each containing the single button label "Allow", resolving into one clean green check mark. A few restrained layers are enough. It should look designed by a person, composed and quiet.
+Style: sophisticated editorial graphic design, precise geometric shapes, subtle printed-paper texture, clean Swiss typography. Wide landscape composition near 3:1. Pale mint background, forest-green ink, ivory cards. Clear hierarchy and generous empty space.
+Text verbatim: "Enough." as the main large title, and "Allow" only on the small dialog buttons. No other words.
+Constraints: no people, no robot, no brain, no sparkles, no neon, no glassmorphism, no glossy 3D, no gradients, no fake product screenshot, no decorative badges, no watermark. Make the title readable at GitHub README width. This is a brand illustration, not a screenshot.

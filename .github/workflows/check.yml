@@ -1,0 +1,14 @@
+name: Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  mac:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: Scripts/check.sh
+      - run: Scripts/build.sh
