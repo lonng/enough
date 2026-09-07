@@ -20,6 +20,9 @@ public final class PermissionEngine {
     private var inactive = false
     private var epoch = 0
     private var lastState: State?
+    private let intentLock = NSLock()
+    private var requestedEnabled = false
+    private var requestedInactive = false
 
     private struct WindowID: Hashable { let pid: pid_t; let hash: CFHashCode }
     private struct Button { let title: String; let element: AXUIElement; let enabled: Bool }
@@ -48,12 +51,19 @@ public final class PermissionEngine {
     }
 
     public func stop() {
+        intentLock.lock()
+        requestedEnabled = false
+        intentLock.unlock()
         tokens.forEach { $0.0.removeObserver($0.1) }
         tokens.removeAll()
         queue.sync { wanted = false; reset(); publish(.paused) }
     }
 
     public func setEnabled(_ value: Bool) {
+        // The main thread can interrupt a long scan before its queued state update runs.
+        intentLock.lock()
+        requestedEnabled = value
+        intentLock.unlock()
         queue.async { [weak self] in
             guard let self = self else { return }
             self.wanted = value
@@ -65,6 +75,9 @@ public final class PermissionEngine {
     public func refresh() { queue.async { [weak self] in self?.reconcile() } }
 
     private func setInactive(_ value: Bool) {
+        intentLock.lock()
+        requestedInactive = value
+        intentLock.unlock()
         queue.async { [weak self] in
             guard let self = self else { return }
             self.inactive = value
@@ -88,7 +101,12 @@ public final class PermissionEngine {
         DispatchQueue.main.async { [weak self] in self?.onEvent?(event) }
     }
 
-    private var mayAct: Bool { wanted && !inactive && AXIsProcessTrusted() }
+    private var mayAct: Bool {
+        intentLock.lock()
+        let allowed = requestedEnabled && !requestedInactive
+        intentLock.unlock()
+        return allowed && AXIsProcessTrusted()
+    }
 
     private func reconcile() {
         guard wanted else { publish(.paused); return }
@@ -241,7 +259,7 @@ public final class PermissionEngine {
             guard complete else { return }
             guard depth <= 16, seen.count < 500, ProcessInfo.processInfo.systemUptime < deadline else { complete = false; return }
             guard seen.insert(CFHash(element)).inserted else { return }
-            let role = attribute(element, kAXRoleAttribute) as? String ?? ""
+            guard let role = attribute(element, kAXRoleAttribute) as? String else { complete = false; return }
             if role == kAXStaticTextRole {
                 let title = attribute(element, kAXTitleAttribute) as? String ?? ""
                 let value = title.isEmpty ? (attribute(element, kAXValueAttribute) as? String ?? "") : title
@@ -253,7 +271,14 @@ public final class PermissionEngine {
                 let enabled = attribute(element, kAXEnabledAttribute) as? Bool ?? false
                 buttons.append(Button(title: title, element: element, enabled: enabled))
             }
-            for child in attribute(element, kAXChildrenAttribute) as? [AXUIElement] ?? [] { walk(child, depth + 1) }
+            var children: CFTypeRef?
+            let childrenResult = AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &children)
+            if childrenResult == .success {
+                guard let elements = children as? [AXUIElement] else { complete = false; return }
+                for child in elements { walk(child, depth + 1) }
+            } else if childrenResult != .attributeUnsupported && childrenResult != .noValue {
+                complete = false
+            }
         }
         walk(window, 0)
         return Snapshot(texts: texts, buttons: buttons, complete: complete)
