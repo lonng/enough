@@ -23,6 +23,7 @@ public final class PermissionEngine {
     private let intentLock = NSLock()
     private var requestedEnabled = false
     private var requestedInactive = false
+    private var requestedPolicy = PermissionPolicy()
 
     private struct WindowID: Hashable { let pid: pid_t; let hash: CFHashCode }
     private struct Button { let title: String; let element: AXUIElement; let enabled: Bool }
@@ -73,6 +74,20 @@ public final class PermissionEngine {
     }
 
     public func refresh() { queue.async { [weak self] in self?.reconcile() } }
+
+    public func setPolicy(_ policy: PermissionPolicy) {
+        intentLock.lock()
+        requestedPolicy = policy
+        intentLock.unlock()
+        // Revisit ignored windows, but never press a second button on an already handled request.
+        refresh()
+    }
+
+    private func action(for kind: PermissionKind) -> PermissionAction {
+        intentLock.lock()
+        defer { intentLock.unlock() }
+        return requestedPolicy[kind]
+    }
 
     private func setInactive(_ value: Bool) {
         intentLock.lock()
@@ -198,17 +213,20 @@ public final class PermissionEngine {
             if let prefix = requesterPrefix, !request.requester.hasPrefix(prefix) { continue }
             guard handled[id] != request.title else { continue }
             if observeOnly { handled[id] = request.title; emit(request, "Observed"); continue }
+            let action = action(for: request.kind)
+            guard let buttonTitle = action.buttonTitle else { continue }
             // Re-read the same window immediately before acting. Never search a different window for a button.
             let fresh = snapshot(window)
             guard mayAct, trustedHost(pid), self.request(in: fresh) == request,
-                  let button = fresh.buttons.first(where: { PermissionRules.normalize($0.title) == "Allow" && $0.enabled }) else { continue }
+                  let button = fresh.buttons.first(where: { PermissionRules.normalize($0.title) == buttonTitle && $0.enabled }) else { continue }
             var actions: CFArray?
             guard AXUIElementCopyActionNames(button.element, &actions) == .success,
                   (actions as? [String])?.contains(kAXPressAction) == true else { emit(request, "Button unavailable"); continue }
+            guard mayAct, self.action(for: request.kind) == action else { continue }
             handled[id] = request.title
             let result = AXUIElementPerformAction(button.element, kAXPressAction as CFString)
             guard result == .success else { emit(request, "Click failed (\(result.rawValue))"); continue }
-            emit(request, "Clicked Allow")
+            emit(request, "Clicked \(buttonTitle)")
             verify(window, pid: pid, request: request, generation: epoch, final: false)
         }
     }

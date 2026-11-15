@@ -15,6 +15,7 @@ ENOUGH_APP="$ENOUGH_DIST/Enough.app"
 mkdir -p "$ENOUGH_APP/Contents/MacOS" "$ENOUGH_APP/Contents/Resources"
 lipo -create "${ENOUGH_BINARIES[@]}" -output "$ENOUGH_APP/Contents/MacOS/Enough"
 cp "$ENOUGH_ROOT/Assets/Info.plist" "$ENOUGH_APP/Contents/Info.plist"
+cp -R "$ENOUGH_BIN_DIR/Enough_Enough.bundle" "$ENOUGH_APP/Contents/Resources/"
 xcrun swift "$ENOUGH_ROOT/Scripts/make-icon.swift" "$ENOUGH_SCRATCH/Enough.iconset"
 iconutil -c icns "$ENOUGH_SCRATCH/Enough.iconset" -o "$ENOUGH_APP/Contents/Resources/Enough.icns"
 if [[ "$ENOUGH_IDENTITY" == "-" ]]; then

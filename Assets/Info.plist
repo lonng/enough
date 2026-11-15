@@ -4,6 +4,8 @@
 <key>CFBundleIdentifier</key><string>com.adore.enough</string>
 <key>CFBundleName</key><string>Enough</string>
 <key>CFBundleDisplayName</key><string>Enough</string>
+<key>CFBundleDevelopmentRegion</key><string>en</string>
+<key>CFBundleLocalizations</key><array><string>en</string><string>zh-Hans</string><string>zh-Hant</string></array>
 <key>CFBundleExecutable</key><string>Enough</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleVersion</key><string>1</string>

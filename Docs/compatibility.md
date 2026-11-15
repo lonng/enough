@@ -2,6 +2,16 @@
 
 Enough v0.1.0 is an early release. Building for an OS version is different from testing it on that version.
 
+## Unreleased source changes
+
+Source builds also recognize English removable-volume requests: `“App” would like to access files on a removable volume.` The `wants` variant is supported too, with or without a final period. These requests use the same signed system-host, headline, and Allow/Don't Allow button checks as folder requests. Activity is recorded as `Removable volumes`.
+
+The menu bar icon opens a native grouped settings panel. Each supported permission type has an Allow, Deny, or Ignore rule, saved locally and applied immediately. Missing or invalid rules default to Ignore, including on upgrade from v0.1.0. Ignore leaves the request for manual handling. Changing a rule rechecks pending requests without clicking an already handled dialog again. Pausing stops both automatic Allow and automatic Don't Allow actions.
+
+Configuration and Activity have separate tabs. The panel inherits the system's light or dark appearance and selects English, Simplified Chinese, or Traditional Chinese from the system language preferences, with English as the fallback. This localization covers the interface; the supported system permission titles are still English.
+
+Matching, rejection, and policy persistence are covered by 70 automated checks. Live approval of a removable-volume dialog and automatic denial have not yet been verified. These changes are not included in the v0.1.0 download.
+
 ## Tested on September 7, 2026
 
 macOS 27.0 beta, build 26A5425a, Apple Silicon.
@@ -16,11 +26,11 @@ macOS 27.0 beta, build 26A5425a, Apple Silicon.
 | Request matching | 28 checks, including an app-supplied purpose string that imitates a supported title |
 | Signed installer | Apple notarization, stapling, signatures, universal architecture, and Gatekeeper checks passed on the build runner and this Mac |
 
-The macOS 14.8.9 runner allowed the fixtures to read without showing permission dialogs. That run is inconclusive for automatic approval. The downloadable binary was built from commit `9a57333ab6479f306b4f6bf18200e3f59deed72e`; subsequent release-page changes affect documentation and artwork only.
+The macOS 14.8.9 runner allowed the fixtures to read without showing permission dialogs. That run is inconclusive for automatic approval. The downloadable v0.1.0 binary was built from commit `9a57333ab6479f306b4f6bf18200e3f59deed72e`.
 
 The development app handled three folder requests launched together. This is not a test of hundreds of queued windows. Later repeat runs included manual interaction and are not counted as automatic approval evidence. The packaged release uses a stricter headline check than the first GUI integration run.
 
-Only English prompt titles hosted by Apple's signed `com.apple.UserNotificationCenter` process are eligible. A different host, wording, unreadable headline, extra action button, or incomplete Accessibility tree causes the app to leave the request alone. Some protected dialogs may not expose a usable Allow action.
+Only English prompt titles hosted by Apple's signed `com.apple.UserNotificationCenter` process are eligible. A different host, wording, unreadable headline, extra action button, or incomplete Accessibility tree causes the app to leave the request alone. Some protected dialogs may not expose a usable button action.
 
 The observer disconnects while paused, asleep, locked, or in an inactive user session. It reconnects on session and app events. Lock, sleep, Spaces, multiple displays, Intel hardware, and older macOS versions still need live coverage.
 
@@ -40,7 +50,7 @@ Dialog detection uses events. There are bounded delays for coalescing events and
 
 The last 500 events are saved in `~/Library/Application Support/Enough/activity.json`. Each includes a timestamp, requesting app name, permission category, and action result. File paths and dialog body text are not recorded.
 
-`Clicked Allow` means the Accessibility action succeeded. `Dialog closed` means the original window disappeared. These do not by themselves prove that an arbitrary requesting app completed its operation. Integration tests separately check the requesting fixture's result.
+`Clicked Allow` and `Clicked Don't Allow` mean the corresponding Accessibility action succeeded. `Dialog closed` means the original window disappeared. These do not by themselves prove that an arbitrary requesting app completed its operation. Integration tests separately check the requesting fixture's result.
 
 ## Integration fixtures
 
@@ -48,4 +58,4 @@ The last 500 events are saved in `~/Library/Application Support/Enough/activity.
 
 The owner must be Developer ID signed to exercise cross-developer app-container protection reliably. An ad hoc owner and reader can access the fixture without showing a permission dialog, which is not a successful approval test.
 
-The `Enough --probe --requester-prefix "Enough Fixture" --seconds 30` test mode runs the same engine for a bounded interval. `--observe-only` records matches without clicking. It still needs Accessibility trust. Reset only the disposable fixture's permission when repeating a test, never all app permissions.
+The `Enough --probe --requester-prefix "Enough Fixture" --seconds 30` test mode runs the same engine for a bounded interval with all supported types set to Allow, independently of saved app settings. Use `--action deny` or `--action ignore` to exercise those policies. `--observe-only` records matches without clicking regardless of the policy. It still needs Accessibility trust. Reset only the disposable fixture's permission when repeating a test, never all app permissions.

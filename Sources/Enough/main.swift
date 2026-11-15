@@ -10,6 +10,11 @@ if arguments.contains("--probe") {
     let engine = PermissionEngine()
     engine.requesterPrefix = argument("--requester-prefix")
     engine.observeOnly = arguments.contains("--observe-only")
+    guard let action = PermissionAction(rawValue: argument("--action") ?? "allow") else {
+        fputs("--action must be allow, deny, or ignore\n", stderr)
+        exit(64)
+    }
+    engine.setPolicy(PermissionPolicy(storedValues: Dictionary(uniqueKeysWithValues: PermissionKind.allCases.map { ($0.rawValue, action.rawValue) })))
     engine.onState = { state in print("state: \(state.rawValue)"); fflush(stdout) }
     engine.onEvent = { event in
         let encoder = JSONEncoder()
