@@ -34,7 +34,7 @@ public enum PermissionRules {
             if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access files in your (Documents|Desktop|Downloads) folder\.?$"#, title),
                let kind = PermissionKind(rawValue: groups[1]) {
                 matches.append(PermissionRequest(requester: groups[0], kind: kind, title: title))
-            } else if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access files on a removable volume\.?$"#, title) {
+            } else if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access files on (?:a |the )?removable (?:volume|volumes|disk|disks|drive|drives)\.?$"#, title) {
                 matches.append(PermissionRequest(requester: groups[0], kind: .removableVolumes, title: title))
             } else if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access data from other apps\.?$"#, title) {
                 matches.append(PermissionRequest(requester: groups[0], kind: .appData, title: title))

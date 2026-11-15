@@ -9,16 +9,39 @@ for (points, scale) in [(16,1),(16,2),(32,1),(32,2),(128,1),(128,2),(256,1),(256
     NSGraphicsContext.current = context
     let transform = AffineTransform(scale: CGFloat(pixels) / 1024)
     (transform as NSAffineTransform).concat()
-    NSColor(srgbRed: 0.075, green: 0.29, blue: 0.19, alpha: 1).setFill()
-    NSBezierPath(roundedRect: NSRect(x: 64, y: 64, width: 896, height: 896), xRadius: 194, yRadius: 194).fill()
-    NSColor(srgbRed: 0.88, green: 0.95, blue: 0.85, alpha: 1).setStroke()
+
+    let canvas = NSRect(x: 0, y: 0, width: 1024, height: 1024)
+    let tile = NSBezierPath(roundedRect: canvas.insetBy(dx: 32, dy: 32), xRadius: 216, yRadius: 216)
+    NSGraphicsContext.saveGraphicsState()
+    tile.addClip()
+    let gradient = NSGradient(colors: [
+        NSColor(srgbRed: 0.22, green: 0.86, blue: 0.56, alpha: 1),
+        NSColor(srgbRed: 0.04, green: 0.42, blue: 0.28, alpha: 1)
+    ])!
+    gradient.draw(in: canvas, angle: 35)
+
+    let highlight = NSBezierPath(roundedRect: NSRect(x: 32, y: 504, width: 960, height: 520),
+                                 xRadius: 216, yRadius: 216)
+    NSColor.white.withAlphaComponent(0.12).setFill()
+    highlight.fill()
+    NSGraphicsContext.restoreGraphicsState()
+
+    let border = NSBezierPath(roundedRect: canvas.insetBy(dx: 34, dy: 34), xRadius: 212, yRadius: 212)
+    border.lineWidth = 12
+    NSColor.black.withAlphaComponent(0.16).setStroke()
+    border.stroke()
+
+    NSColor.white.withAlphaComponent(0.96).setStroke()
     let check = NSBezierPath()
-    check.lineWidth = 90
+    check.lineWidth = 80
     check.lineCapStyle = .round
     check.lineJoinStyle = .round
-    check.move(to: NSPoint(x: 280, y: 500))
-    check.line(to: NSPoint(x: 445, y: 345))
-    check.line(to: NSPoint(x: 750, y: 690))
+    check.move(to: NSPoint(x: 228, y: 504))
+    check.line(to: NSPoint(x: 348, y: 384))
+    check.line(to: NSPoint(x: 504, y: 560))
+    check.move(to: NSPoint(x: 444, y: 448))
+    check.line(to: NSPoint(x: 504, y: 388))
+    check.line(to: NSPoint(x: 788, y: 664))
     check.stroke()
     NSGraphicsContext.restoreGraphicsState()
     let suffix = scale == 2 ? "@2x" : ""

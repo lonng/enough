@@ -21,6 +21,18 @@ for verb in ["wants", "would like"] {
         }
     }
 }
+for wording in [
+    "access files on a removable volume.",
+    "access files on a removable volume",
+    "access files on the removable volume.",
+    "access files on removable volumes.",
+    "access files on a removable disk.",
+    "access files on a removable drive."
+] {
+    let removable = "“Python” would like to \(wording)"
+    expect(PermissionRules.match(texts: [removable], buttons: buttons)?.kind == .removableVolumes,
+           "Match removable-volume wording: \(wording)")
+}
 let title = "“Python” would like to access files in your Documents folder."
 let removableTitle = "“Python” would like to access files on a removable volume."
 expect(PermissionRules.match(texts: [removableTitle, removableTitle], buttons: buttons)?.kind == .removableVolumes, "Deduplicate removable volume AX text")

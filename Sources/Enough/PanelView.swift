@@ -49,6 +49,13 @@ struct PanelView: View {
                 Button("GitHub", action: actions.openGitHub)
                     .buttonStyle(.borderless)
                 Spacer()
+                Button(action: actions.quit) {
+                    Image(systemName: "power")
+                }
+                .buttonStyle(.borderless)
+                .help(L10n.text("Quit Enough"))
+                .accessibilityLabel(L10n.text("Quit Enough"))
+                .keyboardShortcut("q", modifiers: .command)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
@@ -135,7 +142,7 @@ struct PanelView: View {
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(Array(model.events.suffix(80).reversed())) { event in
+                        ForEach(model.events.reversed()) { event in
                             HStack(alignment: .top, spacing: 16) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(event.app).lineLimit(1)
@@ -160,34 +167,37 @@ struct PanelView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Image(nsImage: MenuBarIcon.automaticApproval)
-                .renderingMode(.template).resizable().scaledToFit()
-                .foregroundStyle(.primary)
+            Image(nsImage: MenuBarIcon.appIcon)
+                .resizable().scaledToFit()
                 .frame(width: 36, height: 36)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
-                Text("Enough").font(.system(size: 23, weight: .semibold, design: .rounded))
+                HStack(spacing: 8) {
+                    Text("Enough").font(.system(size: 23, weight: .semibold, design: .rounded))
+                    if !model.hasAccessibility {
+                        Text(L10n.text("Needs Accessibility"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.orange)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.orange.opacity(0.14), in: Capsule())
+                            .accessibilityLabel(L10n.text("Needs Accessibility"))
+                    }
+                }
                 Text(L10n.text("Your permissions. Your rules."))
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer(minLength: 8)
-            HStack(spacing: 8) {
+            if !model.hasAccessibility {
+                Button(L10n.text("Open Settings"), action: actions.grantAccess)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .frame(minWidth: 128)
+            } else {
                 Label(L10n.text(model.state.rawValue), systemImage: statusSymbol)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
-                if !model.hasAccessibility {
-                    Button(L10n.text("Open Settings"), action: actions.grantAccess)
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                }
             }
-            Button(action: actions.quit) {
-                Image(systemName: "power")
-            }
-            .buttonStyle(.borderless)
-            .help(L10n.text("Quit Enough"))
-            .accessibilityLabel(L10n.text("Quit Enough"))
-            .keyboardShortcut("q", modifiers: .command)
         }
         .padding(.horizontal, 24)
         .padding(.top, 20)
