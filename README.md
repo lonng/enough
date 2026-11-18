@@ -60,14 +60,16 @@ make run
 | `make check` / `make test` | Run permission matching and policy checks |
 | `make build` | Build `dist/Enough.app` for Intel and Apple Silicon |
 | `make open` | Restart the existing build and show its panel |
+| `make install` | Build, install the app to `/Applications`, and relaunch it |
+| `make dev-identity` | Create a local signing identity so installs stop asking for Accessibility again |
 | `make fixtures` | Build disposable test apps in `dist/fixtures` |
 | `make release` | Sign, notarize, and package a release |
 | `make verify-release` | Verify the signed app and DMG for the current `VERSION` |
 | `make clean` | Remove the default `.build` and `dist` directories |
 
-The targets use the existing scripts and their environment variables. For example, `make run ENOUGH_OUTPUT_DIR=/tmp/enough-dist` builds and opens the app in a different output directory.
+The targets use the existing scripts and their environment variables. For example, `make run ENOUGH_OUTPUT_DIR=/tmp/enough-dist` builds and opens the app in a different output directory, and `make install ENOUGH_INSTALL_DIR=~/Applications` installs to your personal Applications folder.
 
-Local builds use an ad hoc signature. `make release` uses the [release script](Scripts/release.sh), which requires a Developer ID identity and notarization credentials through environment variables. Rebuilding an ad hoc app can require granting Accessibility again.
+Local builds use an ad hoc signature. `make dev-identity` creates a self-signed identity that `make install` then uses automatically, keeping one stable signature so Accessibility access survives rebuilds. `make release` uses the [release script](Scripts/release.sh), which requires a Developer ID identity and notarization credentials through environment variables. Rebuilding an ad hoc app can require granting Accessibility again.
 
 `Sources/` is the app. `Tests/` checks request matching. `Scripts/` builds and packages it. `Assets/` holds the icon source metadata and banner.
 

@@ -3,7 +3,7 @@
 export ENOUGH_OUTPUT_DIR ?= $(CURDIR)/dist
 ENOUGH_VERSION := $(shell cat VERSION)
 
-.PHONY: help check test build run open fixtures release verify-release clean
+.PHONY: help check test build run open install dev-identity fixtures release verify-release clean
 
 help:
 	@printf '%s\n' \
@@ -14,12 +14,15 @@ help:
 		'  build           Build the Intel + Apple Silicon app' \
 		'  run             Build, restart Enough, and show its panel' \
 		'  open            Restart the existing build and show its panel' \
+		'  install         Build, install to /Applications, and relaunch' \
+		'  dev-identity    Create a stable local signing identity' \
 		'  fixtures        Build disposable integration fixtures' \
 		'  release         Sign, notarize, and package a release (credentials required)' \
 		'  verify-release  Verify the signed app and DMG for VERSION' \
 		'  clean           Remove the default .build and dist directories' \
 		'' \
-		'Output directory: ENOUGH_OUTPUT_DIR (default: dist/)'
+		'Output directory: ENOUGH_OUTPUT_DIR (default: dist/)' \
+		'Install directory: ENOUGH_INSTALL_DIR (default: /Applications)'
 
 check:
 	@Scripts/check.sh
@@ -35,6 +38,12 @@ run: build
 
 open:
 	@Scripts/run.sh
+
+install:
+	@Scripts/install.sh
+
+dev-identity:
+	@Scripts/dev-identity.sh
 
 fixtures:
 	@Scripts/Fixtures/build.sh "$(ENOUGH_OUTPUT_DIR)/fixtures"
