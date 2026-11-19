@@ -218,13 +218,14 @@ struct PanelView: View {
                     .controlSize(.small)
                     .font(.subheadline)
             }
-            if model.events.isEmpty {
+            let clicks = model.events.filter { $0.result == "Clicked Allow" || $0.result == "Clicked Don't Allow" }
+            if clicks.isEmpty {
                 Text(L10n.text("No activity yet"))
                     .font(.subheadline).foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 6)
             } else {
-                let latest = Array(model.events.suffix(5).reversed())
+                let latest = Array(clicks.suffix(5).reversed())
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(latest.enumerated()), id: \.element.id) { index, event in
                         timelineRow(event, isFirst: index == 0, isLast: index == latest.count - 1)
