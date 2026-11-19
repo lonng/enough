@@ -26,6 +26,7 @@ struct PanelActions {
 struct PanelView: View {
     @ObservedObject var model: PanelModel
     let actions: PanelActions
+    @State private var picker: PermissionAction?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -45,7 +46,7 @@ struct PanelView: View {
                     .font(.caption2).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.bottom, 12)
+            .padding(.vertical, 12)
             Divider()
             activity
                 .padding(.vertical, 12)
@@ -115,22 +116,19 @@ struct PanelView: View {
             HStack {
                 Text(L10n.text(titleKey)).font(.callout)
                 Spacer()
-                Menu {
-                    ForEach(PermissionKind.allCases, id: \.self) { kind in
-                        Toggle(isOn: Binding(
-                            get: { model.policy[kind] == action },
-                            set: { actions.setRule(kind, $0 ? action : .ignore) }
-                        )) {
-                            Text(L10n.text(kind.rawValue))
-                        }
-                    }
-                } label: {
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                Button { picker = picker == action ? nil : action } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.tint)
                 }
+                .buttonStyle(.borderless)
                 .controlSize(.small)
-                .fixedSize()
+                .popover(isPresented: Binding(
+                    get: { picker == action },
+                    set: { if !$0, picker == action { picker = nil } }
+                ), arrowEdge: .bottom) {
+                    actionPickerPanel(titleKey: titleKey, action: action)
+                }
                 .accessibilityLabel(L10n.text(titleKey))
             }
             if selected.isEmpty {
@@ -155,6 +153,36 @@ struct PanelView: View {
                 }
             }
         }
+    }
+
+    /// The multi-select dropdown panel behind the adjust icon.
+    private func actionPickerPanel(titleKey: String, action: PermissionAction) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(L10n.text(titleKey))
+                .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                .padding(.horizontal, 10)
+                .padding(.bottom, 6)
+            ForEach(PermissionKind.allCases, id: \.self) { kind in
+                Toggle(isOn: Binding(
+                    get: { model.policy[kind] == action },
+                    set: { actions.setRule(kind, $0 ? action : .ignore) }
+                )) {
+                    HStack(spacing: 8) {
+                        Image(systemName: kind.symbol)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 16)
+                        Text(L10n.text(kind.rawValue))
+                    }
+                }
+                .toggleStyle(.checkbox)
+                .controlSize(.small)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+            }
+        }
+        .padding(.vertical, 8)
+        .frame(width: 240)
     }
 
     private var launchRow: some View {
@@ -241,6 +269,21 @@ struct PanelView: View {
         if !model.hasAccessibility { return "Grant Accessibility access to start." }
         if model.state == .sleeping { return "Waiting for your session to become active." }
         return model.policy.hasAutomaticActions ? "Watching for requests that match your rules." : "All requests are ignored. Choose a rule below to start."
+    }
+}
+
+private extension PermissionKind {
+    var symbol: String {
+        switch self {
+        case .documents: return "doc.text"
+        case .desktop: return "desktopcomputer"
+        case .downloads: return "arrow.down.circle"
+        case .musicFolder: return "music.note"
+        case .moviesFolder: return "film"
+        case .picturesFolder: return "photo"
+        case .removableVolumes: return "externaldrive"
+        case .appData: return "square.stack.3d.up"
+        }
     }
 }
 
