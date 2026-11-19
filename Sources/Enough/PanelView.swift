@@ -227,7 +227,7 @@ struct PanelView: View {
                 let latest = Array(model.events.suffix(5).reversed())
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(latest.enumerated()), id: \.element.id) { index, event in
-                        timelineRow(event, isLast: index == latest.count - 1)
+                        timelineRow(event, isFirst: index == 0, isLast: index == latest.count - 1)
                     }
                 }
             }
@@ -235,15 +235,17 @@ struct PanelView: View {
     }
 
     /// One timeline node: a colored dot on a shared vertical rail, the time, then the event.
-    private func timelineRow(_ event: ApprovalEvent, isLast: Bool) -> some View {
+    /// The rail runs the full row so consecutive nodes connect; it starts at the first
+    /// dot's center and ends at the last one's, with the dots drawn above it.
+    private func timelineRow(_ event: ApprovalEvent, isFirst: Bool, isLast: Bool) -> some View {
         HStack(alignment: .top, spacing: 10) {
             ZStack(alignment: .top) {
-                if !isLast {
+                if !(isFirst && isLast) {
                     Rectangle()
                         .fill(Color.primary.opacity(0.18))
                         .frame(width: 1.5)
-                        .padding(.top, 4)
-                        .frame(maxHeight: .infinity)
+                        .padding(.top, isFirst ? 7.5 : 0)
+                        .frame(maxHeight: isLast ? 7.5 : .infinity, alignment: .top)
                 }
                 Circle()
                     .fill(eventTint(event.result))
@@ -251,16 +253,20 @@ struct PanelView: View {
                     .padding(.top, 3)
             }
             .frame(width: 9)
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(event.date, style: .time)
-                        .font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
-                    Text(event.app).font(.callout.weight(.medium)).lineLimit(1)
-                }
-                Text("\(L10n.text(event.permission)) · \(L10n.text(event.result))")
-                    .font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+            .frame(maxHeight: .infinity, alignment: .top)
+            HStack(spacing: 8) {
+                Text(event.date, style: .time)
+                    .font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
+                Spacer(minLength: 8)
+                (
+                    Text(event.app).fontWeight(.semibold)
+                    + Text("  \(L10n.text(event.permission)) · \(L10n.text(event.result))").foregroundStyle(.secondary)
+                )
+                .font(.subheadline)
+                .lineLimit(1)
+                .truncationMode(.middle)
             }
-            .padding(.bottom, isLast ? 0 : 10)
+            .padding(.vertical, 4)
         }
         .textSelection(.enabled)
     }
