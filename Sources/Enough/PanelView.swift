@@ -252,7 +252,7 @@ struct PanelView: View {
             .frame(width: 9)
             .frame(maxHeight: .infinity, alignment: .top)
             HStack(spacing: 8) {
-                Text(event.date, style: .time)
+                Text(event.date, format: .dateTime.year().month().day().hour().minute())
                     .font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
                 Text(event.app)
                     .font(.subheadline.weight(.semibold)).lineLimit(1)
