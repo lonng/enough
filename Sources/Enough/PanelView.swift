@@ -260,7 +260,7 @@ struct PanelView: View {
                 Spacer(minLength: 8)
                 (
                     Text(event.app).fontWeight(.semibold)
-                    + Text("  \(L10n.text(event.permission)) · \(L10n.text(event.result))").foregroundStyle(.secondary)
+                    + Text("  \(L10n.text(event.permission)) · \(L10n.text(event.result))").foregroundColor(.secondary)
                 )
                 .font(.subheadline)
                 .lineLimit(1)
