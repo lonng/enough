@@ -160,8 +160,8 @@ struct PanelView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(L10n.text(titleKey))
                 .font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
-                .padding(.horizontal, 14)
-                .padding(.top, 12)
+                .padding(.horizontal, 10)
+                .padding(.top, 10)
                 .padding(.bottom, 4)
             ForEach(PermissionKind.allCases, id: \.self) { kind in
                 Toggle(isOn: Binding(
@@ -178,12 +178,12 @@ struct PanelView: View {
                 }
                 .toggleStyle(.checkbox)
                 .controlSize(.small)
-                .padding(.horizontal, 14)
+                .padding(.horizontal, 10)
                 .padding(.vertical, 4)
             }
         }
-        .padding(.bottom, 10)
-        .frame(width: 258)
+        .padding(.bottom, 8)
+        .frame(width: 220)
     }
 
     private var launchRow: some View {
