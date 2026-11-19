@@ -27,6 +27,13 @@ struct PanelView: View {
     let actions: PanelActions
     @State private var picker: PermissionAction?
 
+    private static let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
@@ -252,7 +259,7 @@ struct PanelView: View {
             .frame(width: 9)
             .frame(maxHeight: .infinity, alignment: .top)
             HStack(spacing: 8) {
-                Text(event.date, format: .dateTime.year().month().day().hour().minute())
+                Text(Self.timeFormatter.string(from: event.date))
                     .font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
                 Text(event.app)
                     .font(.subheadline.weight(.semibold)).lineLimit(1)
