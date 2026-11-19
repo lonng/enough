@@ -4,6 +4,9 @@ public enum PermissionKind: String, Codable, CaseIterable {
     case documents = "Documents"
     case desktop = "Desktop"
     case downloads = "Downloads"
+    case musicFolder = "Music"
+    case moviesFolder = "Movies"
+    case picturesFolder = "Pictures"
     case removableVolumes = "Removable volumes"
     case appData = "App data"
 }
@@ -31,7 +34,7 @@ public enum PermissionRules {
         let titles = Set(texts.map(normalize))
         var matches: [PermissionRequest] = []
         for title in titles {
-            if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access files in your (Documents|Desktop|Downloads) folder\.?$"#, title),
+            if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access files in your (Documents|Desktop|Downloads|Music|Movies|Pictures) folder\.?$"#, title),
                let kind = PermissionKind(rawValue: groups[1]) {
                 matches.append(PermissionRequest(requester: groups[0], kind: kind, title: title))
             } else if let groups = captures(#"^"([^"\r\n]{1,180})" (?:would like|wants) to access files on (?:a |the )?removable (?:volume|volumes|disk|disks|drive|drives)\.?$"#, title) {

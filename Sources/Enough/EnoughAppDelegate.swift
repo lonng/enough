@@ -4,13 +4,13 @@ import ServiceManagement
 import SwiftUI
 import EnoughCore
 
-final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let engine = PermissionEngine()
     private let defaults = UserDefaults.standard
     private let history = HistoryStore()
     private let panel = PanelModel()
     private var item: NSStatusItem!
-    private var window: NSWindow?
+    private var popover: NSPopover?
     private var setupTimer: Timer?
     private var enabled: Bool { defaults.bool(forKey: "enabled") }
 
@@ -24,7 +24,7 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         panel.events = history.events
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.target = self
-        item.button?.action = #selector(showWindow(_:))
+        item.button?.action = #selector(togglePopover(_:))
         engine.onState = { [weak self] state in self?.panel.state = state; self?.updateUI() }
         engine.onEvent = { [weak self] event in
             guard let self = self else { return }
@@ -35,19 +35,19 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         engine.start(enabled: enabled)
         if !defaults.bool(forKey: "hasOpened") || !AXIsProcessTrusted() || CommandLine.arguments.contains("--show") {
             defaults.set(true, forKey: "hasOpened")
-            showWindow(nil)
+            showPopover()
         }
         updateUI()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        showWindow(nil)
+        showPopover()
         return true
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
         updateUI()
-        if window?.isVisible == true && !AXIsProcessTrusted() { startSetupCheck() }
+        if popover?.isShown == true && !AXIsProcessTrusted() { startSetupCheck() }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -55,6 +55,29 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         engine.stop()
         history.flush()
     }
+
+    @objc private func togglePopover(_ sender: Any?) {
+        if popover?.isShown == true { popover?.performClose(sender) } else { showPopover() }
+    }
+
+    private func showPopover() {
+        if popover == nil {
+            let popover = NSPopover()
+            popover.behavior = .transient
+            popover.animates = true
+            popover.contentViewController = NSHostingController(rootView: PanelView(model: panel, actions: makeActions()))
+            popover.delegate = self
+            self.popover = popover
+        }
+        guard let button = item.button else { return }
+        popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        NSApp.activate(ignoringOtherApps: true)
+        engine.refresh()
+        updateUI()
+        if !AXIsProcessTrusted() { startSetupCheck() }
+    }
+
+    func popoverDidClose(_ notification: Notification) { setupTimer?.invalidate() }
 
     private func setEnabled(_ value: Bool) {
         defaults.set(value, forKey: "enabled")
@@ -77,37 +100,16 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
 
     private func startSetupCheck() {
         setupTimer?.invalidate()
-        // A temporary trust check while setup is visible. Dialog watching itself has no polling timer.
+        // A temporary trust check while the popover is visible. Dialog watching itself has no polling timer.
         setupTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            guard let self = self, self.window?.isVisible == true else { timer.invalidate(); return }
+            guard let self = self, self.popover?.isShown == true else { timer.invalidate(); return }
             if AXIsProcessTrusted() { timer.invalidate(); self.engine.refresh(); self.updateUI() }
         }
         setupTimer?.tolerance = 0.5
     }
 
-    @objc private func showWindow(_ sender: Any?) {
-        if window == nil { buildWindow() }
-        if window?.isMiniaturized == true { window?.deminiaturize(nil) }
-        window?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        engine.refresh()
-        updateUI()
-        if !AXIsProcessTrusted() { startSetupCheck() }
-    }
-
-    func windowWillClose(_ notification: Notification) { setupTimer?.invalidate() }
-
-    private func buildWindow() {
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 660, height: 640),
-                              styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                              backing: .buffered, defer: false)
-        window.title = "Enough"
-        window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
-        window.isReleasedWhenClosed = false
-        window.contentMinSize = NSSize(width: 620, height: 540)
-        window.delegate = self
-        let actions = PanelActions(
+    private func makeActions() -> PanelActions {
+        PanelActions(
             setEnabled: { [weak self] in self?.setEnabled($0) },
             setRule: { [weak self] in self?.setRule($0, $1) },
             setLaunchAtLogin: { [weak self] in self?.setLaunchAtLogin($0) },
@@ -117,9 +119,6 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
             openGitHub: { NSWorkspace.shared.open(URL(string: "https://github.com/jtc268/enough")!) },
             quit: { NSApp.terminate(nil) }
         )
-        window.contentView = NSHostingView(rootView: PanelView(model: panel, actions: actions))
-        window.center()
-        self.window = window
     }
 
     private func updateUI() {
@@ -150,7 +149,7 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate
         let alert = NSAlert()
         alert.messageText = text
         alert.addButton(withTitle: L10n.text("OK"))
-        if let window = window { alert.beginSheetModal(for: window) }
+        if let window = popover?.contentViewController?.view.window { alert.beginSheetModal(for: window) }
         else { alert.runModal() }
     }
 

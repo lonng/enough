@@ -20,6 +20,7 @@
 "On" = "執行中";
 "Paused" = "已暫停";
 "Needs Accessibility" = "需要輔助使用權限";
+"Accessibility Granted" = "輔助使用已授權";
 "Session inactive" = "工作階段未啟用";
 "Paused. You can still edit your rules." = "已暫停，你仍然可以修改規則。";
 "Grant Accessibility access to start." = "授予輔助使用權限後即可開始。";
@@ -30,10 +31,16 @@
 "Desktop" = "桌面";
 "Downloads" = "下載項目";
 "Removable volumes" = "可卸除卷宗";
+"Music" = "音樂";
+"Movies" = "影片";
+"Pictures" = "圖片";
 "App data" = "App 資料";
 "Files in Documents" = "文件資料夾中的檔案";
 "Files on your Desktop" = "桌面上的檔案";
 "Files in Downloads" = "下載項目資料夾中的檔案";
+"Files in your Music folder" = "音樂資料夾中的檔案";
+"Files in your Movies folder" = "影片資料夾中的檔案";
+"Files in your Pictures folder" = "圖片資料夾中的檔案";
 "External disks and USB drives" = "外接磁碟與 USB 隨身碟";
 "Other apps’ data · Experimental" = "其他 App 的資料 · 實驗性功能";
 "Move Enough to Applications first." = "請先將 Enough 移至「應用程式」資料夾。";

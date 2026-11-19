@@ -20,6 +20,7 @@
 "On" = "On";
 "Paused" = "Paused";
 "Needs Accessibility" = "Needs Accessibility";
+"Accessibility Granted" = "Accessibility Granted";
 "Session inactive" = "Session inactive";
 "Paused. You can still edit your rules." = "Paused. You can still edit your rules.";
 "Grant Accessibility access to start." = "Grant Accessibility access to start.";
@@ -30,10 +31,16 @@
 "Desktop" = "Desktop";
 "Downloads" = "Downloads";
 "Removable volumes" = "Removable volumes";
+"Music" = "Music";
+"Movies" = "Movies";
+"Pictures" = "Pictures";
 "App data" = "App data";
 "Files in Documents" = "Files in Documents";
 "Files on your Desktop" = "Files on your Desktop";
 "Files in Downloads" = "Files in Downloads";
+"Files in your Music folder" = "Files in your Music folder";
+"Files in your Movies folder" = "Files in your Movies folder";
+"Files in your Pictures folder" = "Files in your Pictures folder";
 "External disks and USB drives" = "External disks and USB drives";
 "Other apps’ data · Experimental" = "Other apps’ data · Experimental";
 "Move Enough to Applications first." = "Move Enough to Applications first.";

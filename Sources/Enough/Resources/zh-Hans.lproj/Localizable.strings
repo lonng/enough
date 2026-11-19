@@ -20,6 +20,7 @@
 "On" = "运行中";
 "Paused" = "已暂停";
 "Needs Accessibility" = "需要辅助功能权限";
+"Accessibility Granted" = "辅助功能已授权";
 "Session inactive" = "会话未激活";
 "Paused. You can still edit your rules." = "已暂停，你仍然可以修改规则。";
 "Grant Accessibility access to start." = "授予辅助功能权限后即可开始。";
@@ -30,10 +31,16 @@
 "Desktop" = "桌面";
 "Downloads" = "下载";
 "Removable volumes" = "可移动卷";
+"Music" = "音乐";
+"Movies" = "影片";
+"Pictures" = "图片";
 "App data" = "应用数据";
 "Files in Documents" = "文稿文件夹中的文件";
 "Files on your Desktop" = "桌面上的文件";
 "Files in Downloads" = "下载文件夹中的文件";
+"Files in your Music folder" = "音乐文件夹中的文件";
+"Files in your Movies folder" = "影片文件夹中的文件";
+"Files in your Pictures folder" = "图片文件夹中的文件";
 "External disks and USB drives" = "外置磁盘与 USB 驱动器";
 "Other apps’ data · Experimental" = "其他应用的数据 · 实验性功能";
 "Move Enough to Applications first." = "请先将 Enough 移到「应用程序」文件夹。";

@@ -6,9 +6,11 @@ Enough v0.1.0 is an early release. Building for an OS version is different from 
 
 Source builds also recognize English removable-volume requests: `“App” would like to access files on a removable volume.` The `wants` variant is supported too, with or without a final period. These requests use the same signed system-host, headline, and Allow/Don't Allow button checks as folder requests. Activity is recorded as `Removable volumes`.
 
-The menu bar icon opens a native grouped settings panel. Each supported permission type has an Allow, Deny, or Ignore rule, saved locally and applied immediately. Missing or invalid rules default to Ignore, including on upgrade from v0.1.0. Ignore leaves the request for manual handling. Changing a rule rechecks pending requests without clicking an already handled dialog again. Pausing stops both automatic Allow and automatic Don't Allow actions.
+Source builds also cover the Music, Movies, and Pictures folder requests that use the same folder template: `“App” would like to access files in your Music folder.` Live approval of these dialogs has not yet been verified.
 
-Configuration and Activity have separate tabs. The panel inherits the system's light or dark appearance and selects English, Simplified Chinese, or Traditional Chinese from the system language preferences, with English as the fallback. This localization covers the interface; the supported system permission titles are still English.
+The menu bar icon opens a compact popover panel. Each supported permission type is a card with an Allow, Deny, or Ignore rule, saved locally and applied immediately. Missing or invalid rules default to Ignore, including on upgrade from v0.1.0. Ignore leaves the request for manual handling. Changing a rule rechecks pending requests without clicking an already handled dialog again. Pausing stops both automatic Allow and automatic Don't Allow actions.
+
+Rules appear as cards and the five latest responses appear below them. The panel inherits the system's light or dark appearance and selects English, Simplified Chinese, or Traditional Chinese from the system language preferences, with English as the fallback. This localization covers the interface; the supported system permission titles are still English.
 
 Matching, rejection, and policy persistence are covered by 70 automated checks. Live approval of a removable-volume dialog and automatic denial have not yet been verified. These changes are not included in the v0.1.0 download.
 

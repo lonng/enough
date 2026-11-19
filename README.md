@@ -21,7 +21,7 @@ These instructions describe current source builds. The v0.1.0 download uses the 
 1. Move Enough to Applications and open it.
 2. Give Enough **Accessibility** access in System Settings.
 3. Choose **Allow**, **Deny**, or **Ignore** for each permission type. Every type starts at Ignore. Changes are saved locally and take effect immediately.
-4. Leave it running. Click the menu bar icon to open the main panel. The Configuration tab contains rules, pause, and Launch at Login; the Activity tab shows recent responses and opens the log. Quit from the power button at the top.
+4. Leave it running. Click the menu bar icon to open the popover panel: rules as cards, pause, Launch at Login, and the latest responses. Quit from the power button at the bottom.
 
 The interface follows your system appearance and preferred language: English, Simplified Chinese, or Traditional Chinese. Other languages fall back to English. Permission dialog matching currently supports English system prompts.
 
@@ -31,7 +31,7 @@ Rules apply to supported requests from **any app**. **Allow** clicks Allow and g
 
 ## Scope
 
-- Documents, Desktop, and Downloads folder requests.
+- Documents, Desktop, Downloads, Music, Movies, and Pictures folder requests.
 - Removable volume requests (source builds; not included in the v0.1.0 download).
 - Requests to access data from other apps: experimental, not yet verified in a live approval test.
 - English system dialogs with the exact supported wording and buttons.

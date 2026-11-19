@@ -7,7 +7,7 @@ func expect(_ condition: @autoclosure () -> Bool, _ description: String) {
     if !condition() { fputs("FAIL: \(description)\n", stderr); exit(1) }
 }
 let buttons = ["Don’t Allow", "Allow"]
-for (folder, kind) in [("Documents", PermissionKind.documents), ("Desktop", .desktop), ("Downloads", .downloads)] {
+for (folder, kind) in [("Documents", PermissionKind.documents), ("Desktop", .desktop), ("Downloads", .downloads), ("Music", .musicFolder), ("Movies", .moviesFolder), ("Pictures", .picturesFolder)] {
     let match = PermissionRules.match(texts: ["“Python” would like to access files in your \(folder) folder."], buttons: buttons)
     expect(match?.requester == "Python" && match?.kind == kind, "Match \(folder) request")
 }
@@ -51,6 +51,8 @@ for rejected in [
     "“Python” is an app downloaded from the Internet. Are you sure you want to open it?",
     "“Python” would like to control “System Events”.",
     "“Python” would like to access files on a network volume.",
+    "“Python” would like to access files in your Public folder.",
+    "“Python” would like to access files in your music folder.",
     "“Python” would like to erase files on a removable volume.",
     "Help: \(removableTitle)",
     "\(removableTitle) Delete them now.",
@@ -75,8 +77,9 @@ for kind in PermissionKind.allCases {
     expect(defaultPolicy[kind] == .ignore, "Unconfigured \(kind.rawValue) requests are ignored")
 }
 expect(!defaultPolicy.hasAutomaticActions, "A default policy never clicks a button")
-var policy = PermissionPolicy(storedValues: ["Documents": "allow", "Removable volumes": "deny", "App data": "ignore", "Desktop": "unknown", "Camera": "allow"])
+var policy = PermissionPolicy(storedValues: ["Documents": "allow", "Removable volumes": "deny", "App data": "ignore", "Music": "deny", "Desktop": "unknown", "Camera": "allow"])
 expect(policy[.documents] == .allow && policy[.removableVolumes] == .deny && policy[.appData] == .ignore, "Restore independent allow, deny, and ignore rules")
+expect(policy[.musicFolder] == .deny && policy[.moviesFolder] == .ignore && policy[.picturesFolder] == .ignore, "Restore new media folder rules")
 expect(policy[.desktop] == .ignore && policy[.downloads] == .ignore, "Invalid and missing rules default to ignore")
 expect(policy.storedValues["Camera"] == nil, "Unknown permission types cannot become automatic rules")
 expect(policy.hasAutomaticActions, "An allow or deny rule enables automatic handling")
@@ -89,5 +92,6 @@ expect(policy[.documents].buttonTitle == nil && policy[.removableVolumes] == .de
 policy[.removableVolumes] = .allow
 expect(policy[.removableVolumes].buttonTitle == "Allow", "A changed rule selects the new response")
 policy[.removableVolumes] = .ignore
+policy[.musicFolder] = .ignore
 expect(!policy.hasAutomaticActions, "Returning every rule to ignore disables all automatic responses")
 print("PASS: \(checks) permission matching and policy checks")
