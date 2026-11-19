@@ -9,8 +9,9 @@ public final class PermissionEngine {
     /// Used by the test harness. The app leaves this nil to handle all requesters.
     public var requesterPrefix: String?
     public var observeOnly = false
-    /// Keep watching and clicking while only the screen is locked (the session stays active).
-    /// System sleep and other users' sessions always suspend the observer. Set on the main thread.
+    /// Keep watching and clicking while the screen is locked or the session is in the
+    /// background (fast user switching). System sleep always suspends the observer.
+    /// Set on the main thread.
     public var workWhileLocked = false
 
     private let queue = DispatchQueue(label: "com.adore.enough.observer", qos: .utility)
@@ -46,8 +47,8 @@ public final class PermissionEngine {
         }
         observe(workspace, NSWorkspace.willSleepNotification) { [weak self] _ in self?.setInactive(true) }
         observe(workspace, NSWorkspace.didWakeNotification) { [weak self] _ in self?.setInactive(false) }
-        observe(workspace, NSWorkspace.sessionDidResignActiveNotification) { [weak self] _ in self?.setInactive(true) }
-        observe(workspace, NSWorkspace.sessionDidBecomeActiveNotification) { [weak self] _ in self?.setInactive(false) }
+        observe(workspace, NSWorkspace.sessionDidResignActiveNotification) { [weak self] _ in self?.sessionStateChanged(active: false) }
+        observe(workspace, NSWorkspace.sessionDidBecomeActiveNotification) { [weak self] _ in self?.sessionStateChanged(active: true) }
         let distributed = DistributedNotificationCenter.default()
         observe(distributed, Notification.Name("com.apple.screenIsLocked")) { [weak self] _ in self?.screenStateChanged(locked: true) }
         observe(distributed, Notification.Name("com.apple.screenIsUnlocked")) { [weak self] _ in self?.screenStateChanged(locked: false) }
@@ -58,6 +59,13 @@ public final class PermissionEngine {
     private func screenStateChanged(locked: Bool) {
         if locked && workWhileLocked { refresh(); return }
         setInactive(locked)
+    }
+
+    /// With workWhileLocked, a background session (fast user switching) stays under watch too;
+    /// only the frontmost session's user sees these dialogs otherwise.
+    private func sessionStateChanged(active: Bool) {
+        if !active && workWhileLocked { refresh(); return }
+        setInactive(!active)
     }
 
     public func stop() {

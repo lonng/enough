@@ -34,7 +34,7 @@ The development app handled three folder requests launched together. This is not
 
 Only English prompt titles hosted by Apple's signed `com.apple.UserNotificationCenter` process are eligible. A different host, wording, unreadable headline, extra action button, or incomplete Accessibility tree causes the app to leave the request alone. Some protected dialogs may not expose a usable button action.
 
-The observer disconnects while paused, asleep, locked, or in an inactive user session. It reconnects on session and app events. Lock, sleep, Spaces, multiple displays, Intel hardware, and older macOS versions still need live coverage.
+The observer disconnects while paused or asleep. With the Work while locked setting (source builds, on by default) it keeps watching while the screen is locked or the session is in the background; system sleep and other users' own sessions still suspend it. It reconnects on session and app events. Lock, sleep, Spaces, multiple displays, Intel hardware, and older macOS versions still need live coverage.
 
 ## How much access does it grant?
 

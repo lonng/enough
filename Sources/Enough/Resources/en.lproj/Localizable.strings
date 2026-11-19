@@ -3,7 +3,7 @@
 "Activity" = "Activity";
 "Automation" = "Automation";
 "Launch at Login" = "Launch at Login";
-"Work while locked" = "Work while locked";
+"Work while locked" = "Work while locked or in background";
 "Allow Enough in Login Items to finish setup." = "Allow Enough in Login Items to finish setup.";
 "Open Login Items" = "Open Login Items";
 "Permission rules" = "Permission rules";
