@@ -184,7 +184,7 @@ struct PanelView: View {
                 }
                 .toggleStyle(.checkbox)
                 .controlSize(.small)
-                .padding(.trailing, 8)
+                .padding(.horizontal, 8)
                 .padding(.vertical, 3)
             }
         }
