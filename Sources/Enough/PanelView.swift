@@ -257,14 +257,12 @@ struct PanelView: View {
             HStack(spacing: 8) {
                 Text(event.date, style: .time)
                     .font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
+                Text(event.app)
+                    .font(.subheadline.weight(.semibold)).lineLimit(1)
                 Spacer(minLength: 8)
-                (
-                    Text(event.app).fontWeight(.semibold)
-                    + Text("  \(L10n.text(event.permission)) · \(L10n.text(event.result))").foregroundColor(.secondary)
-                )
-                .font(.subheadline)
-                .lineLimit(1)
-                .truncationMode(.middle)
+                Text("\(L10n.text(event.permission)) · \(L10n.text(event.result))")
+                    .font(.subheadline).foregroundColor(.secondary)
+                    .lineLimit(1).truncationMode(.head)
             }
             .padding(.vertical, 4)
         }
