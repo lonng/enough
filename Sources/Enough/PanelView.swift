@@ -159,30 +159,30 @@ struct PanelView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(L10n.text(titleKey))
                 .font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.top, 10)
-                .padding(.bottom, 4)
+                .padding(.horizontal, 8)
+                .padding(.top, 8)
+                .padding(.bottom, 2)
             ForEach(PermissionKind.allCases, id: \.self) { kind in
                 Toggle(isOn: Binding(
                     get: { model.policy[kind] == action },
                     set: { actions.setRule(kind, $0 ? action : .ignore) }
                 )) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         Image(systemName: kind.symbol)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundStyle(.secondary)
-                            .frame(width: 16)
+                            .frame(width: 14)
                         Text(L10n.text(kind.rawValue))
                     }
                 }
                 .toggleStyle(.checkbox)
                 .controlSize(.small)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
             }
         }
-        .padding(.bottom, 8)
-        .frame(width: 220)
+        .padding(.bottom, 6)
+        .frame(width: 192)
     }
 
     private var launchRow: some View {
@@ -240,13 +240,13 @@ struct PanelView: View {
                     Rectangle()
                         .fill(Color.primary.opacity(0.18))
                         .frame(width: 1.5)
-                        .padding(.top, isFirst ? 7.5 : 0)
-                        .frame(maxHeight: isLast ? 7.5 : .infinity, alignment: .top)
+                        .padding(.top, isFirst ? 11.5 : 0)
+                        .frame(maxHeight: isLast ? 11.5 : .infinity, alignment: .top)
                 }
                 Circle()
                     .fill(Color.primary.opacity(0.35))
-                    .frame(width: 9, height: 9)
-                    .padding(.top, 3)
+                    .frame(width: 7, height: 7)
+                    .padding(.top, 8)
             }
             .frame(width: 9)
             .frame(maxHeight: .infinity, alignment: .top)
