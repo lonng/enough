@@ -261,11 +261,12 @@ struct PanelView: View {
                 Text(event.app)
                     .font(.subheadline.weight(.semibold)).lineLimit(1)
                 Spacer(minLength: 8)
-                Text("\(L10n.text(event.permission)) · \(L10n.text(event.result))")
+                Text(L10n.text(event.permission))
                     .font(.subheadline).foregroundColor(.secondary)
-                    .lineLimit(1).truncationMode(.head)
+                    .lineLimit(1)
             }
             .padding(.vertical, 4)
+            .help("\(event.app) · \(L10n.text(event.permission)) · \(L10n.text(event.result))")
         }
         .textSelection(.enabled)
     }
