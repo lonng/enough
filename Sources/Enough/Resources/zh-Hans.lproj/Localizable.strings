@@ -6,6 +6,9 @@
 "Allow Enough in Login Items to finish setup." = "请在系统登录项中允许 Enough 以完成设置。";
 "Open Login Items" = "打开登录项";
 "Permission rules" = "权限规则";
+"Auto allow" = "自动允许";
+"Auto deny" = "自动拒绝";
+"None" = "无";
 "Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only." = "允许将授予访问权限，拒绝将阻止访问，忽略则留待你手动处理。规则适用于所有应用，目前仅识别英文系统权限弹窗。";
 "Recent activity" = "最近活动";
 "Open Activity Log" = "打开活动日志";

@@ -6,6 +6,9 @@
 "Allow Enough in Login Items to finish setup." = "請在系統登入項目中允許 Enough 以完成設定。";
 "Open Login Items" = "開啟登入項目";
 "Permission rules" = "權限規則";
+"Auto allow" = "自動允許";
+"Auto deny" = "自動拒絕";
+"None" = "無";
 "Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only." = "允許將授予存取權限，拒絕將阻止存取，忽略則留待你手動處理。規則適用於所有 App，目前僅辨識英文系統權限對話框。";
 "Recent activity" = "最近活動";
 "Open Activity Log" = "開啟活動記錄檔";

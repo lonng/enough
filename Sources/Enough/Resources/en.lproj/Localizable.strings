@@ -6,6 +6,9 @@
 "Allow Enough in Login Items to finish setup." = "Allow Enough in Login Items to finish setup.";
 "Open Login Items" = "Open Login Items";
 "Permission rules" = "Permission rules";
+"Auto allow" = "Auto allow";
+"Auto deny" = "Auto deny";
+"None" = "None";
 "Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only." = "Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only.";
 "Recent activity" = "Recent activity";
 "Open Activity Log" = "Open Activity Log";

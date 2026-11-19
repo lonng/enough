@@ -32,11 +32,11 @@ struct PanelView: View {
             header
                 .padding(.bottom, 12)
             Divider()
-            toggles
-                .padding(.vertical, 12)
-            Divider()
-            rules
-                .padding(.vertical, 12)
+            VStack(alignment: .leading, spacing: 10) {
+                controlPanel
+                launchRow
+            }
+            .padding(.vertical, 12)
             Divider()
             activity
                 .padding(.vertical, 12)
@@ -88,16 +88,60 @@ struct PanelView: View {
             .accessibilityLabel(L10n.text(model.hasAccessibility ? "Accessibility Granted" : "Needs Accessibility"))
     }
 
-    // MARK: Toggles
+    // MARK: Rules
 
-    private var toggles: some View {
-        VStack(alignment: .leading, spacing: 8) {
+    /// The master Automation switch and the auto-allow / auto-deny lists in one card.
+    /// A kind picked in one list leaves the other; picked in neither, it stays ignored.
+    private var controlPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(L10n.text("Automation")).font(.callout)
+                Text(L10n.text("Automation")).font(.headline)
                 Spacer()
                 Toggle(L10n.text("Automation"), isOn: Binding(get: { model.enabled }, set: actions.setEnabled))
                     .labelsHidden().toggleStyle(.switch).controlSize(.small)
             }
+            Divider()
+            actionMenu(titleKey: "Auto allow", action: .allow)
+            actionMenu(titleKey: "Auto deny", action: .deny)
+            Text(L10n.text("Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only."))
+                .font(.caption2).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func actionMenu(titleKey: String, action: PermissionAction) -> some View {
+        let selected = PermissionKind.allCases.filter { model.policy[$0] == action }
+        let summary = selected.isEmpty ? L10n.text("None")
+            : selected.map { L10n.text($0.rawValue) }.joined(separator: ", ")
+        return HStack {
+            Text(L10n.text(titleKey)).font(.callout)
+            Spacer()
+            Menu {
+                ForEach(PermissionKind.allCases, id: \.self) { kind in
+                    Toggle(isOn: Binding(
+                        get: { model.policy[kind] == action },
+                        set: { actions.setRule(kind, $0 ? action : .ignore) }
+                    )) {
+                        Text(L10n.text(kind.rawValue))
+                    }
+                }
+            } label: {
+                Text(summary)
+                    .font(.callout)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: 180, alignment: .trailing)
+            }
+            .fixedSize()
+            .frame(maxWidth: 190)
+        }
+    }
+
+    private var launchRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(L10n.text("Launch at Login")).font(.callout)
                 Spacer()
@@ -114,47 +158,7 @@ struct PanelView: View {
                 }
             }
         }
-    }
-
-    // MARK: Rules
-
-    private var rules: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(L10n.text("Permission rules")).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
-                ForEach(PermissionKind.allCases, id: \.self) { kind in
-                    permissionCard(kind)
-                }
-            }
-        }
-    }
-
-    private func permissionCard(_ kind: PermissionKind) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 6) {
-                Image(systemName: kind.symbol)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
-                Text(L10n.text(kind.rawValue))
-                    .font(.callout.weight(.medium))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            Picker(L10n.text(kind.rawValue), selection: Binding(get: { model.policy[kind] }, set: { actions.setRule(kind, $0) })) {
-                Text(L10n.text("Allow")).tag(PermissionAction.allow)
-                Text(L10n.text("Deny")).tag(PermissionAction.deny)
-                Text(L10n.text("Ignore")).tag(PermissionAction.ignore)
-            }
-            .labelsHidden()
-            .pickerStyle(.segmented)
-            .controlSize(.small)
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
-        .help(L10n.text(kind.detail))
-        .accessibilityLabel(L10n.text(kind.rawValue))
+        .padding(.horizontal, 2)
     }
 
     // MARK: Activity
@@ -221,33 +225,5 @@ struct PanelView: View {
         if !model.hasAccessibility { return "Grant Accessibility access to start." }
         if model.state == .sleeping { return "Waiting for your session to become active." }
         return model.policy.hasAutomaticActions ? "Watching for requests that match your rules." : "All requests are ignored. Choose a rule below to start."
-    }
-}
-
-private extension PermissionKind {
-    var symbol: String {
-        switch self {
-        case .documents: return "doc.text"
-        case .desktop: return "desktopcomputer"
-        case .downloads: return "arrow.down.circle"
-        case .musicFolder: return "music.note"
-        case .moviesFolder: return "film"
-        case .picturesFolder: return "photo"
-        case .removableVolumes: return "externaldrive"
-        case .appData: return "square.stack.3d.up"
-        }
-    }
-
-    var detail: String {
-        switch self {
-        case .documents: return "Files in Documents"
-        case .desktop: return "Files on your Desktop"
-        case .downloads: return "Files in Downloads"
-        case .musicFolder: return "Files in your Music folder"
-        case .moviesFolder: return "Files in your Movies folder"
-        case .picturesFolder: return "Files in your Pictures folder"
-        case .removableVolumes: return "External disks and USB drives"
-        case .appData: return "Other apps’ data · Experimental"
-        }
     }
 }
