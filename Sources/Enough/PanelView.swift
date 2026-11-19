@@ -33,10 +33,19 @@ struct PanelView: View {
                 .padding(.bottom, 12)
             Divider()
             VStack(alignment: .leading, spacing: 10) {
-                controlPanel
                 launchRow
+                automationRow
             }
             .padding(.vertical, 12)
+            Divider()
+            VStack(alignment: .leading, spacing: 10) {
+                actionMenu(titleKey: "Auto allow", action: .allow)
+                actionMenu(titleKey: "Auto deny", action: .deny)
+                Text(L10n.text("Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only."))
+                    .font(.caption2).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.bottom, 12)
             Divider()
             activity
                 .padding(.vertical, 12)
@@ -90,53 +99,61 @@ struct PanelView: View {
 
     // MARK: Rules
 
-    /// The master Automation switch and the auto-allow / auto-deny lists in one card.
-    /// A kind picked in one list leaves the other; picked in neither, it stays ignored.
-    private var controlPanel: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(L10n.text("Automation")).font(.headline)
-                Spacer()
-                Toggle(L10n.text("Automation"), isOn: Binding(get: { model.enabled }, set: actions.setEnabled))
-                    .labelsHidden().toggleStyle(.switch).controlSize(.small)
-            }
-            Divider()
-            actionMenu(titleKey: "Auto allow", action: .allow)
-            actionMenu(titleKey: "Auto deny", action: .deny)
-            Text(L10n.text("Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only."))
-                .font(.caption2).foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+    private var automationRow: some View {
+        HStack {
+            Text(L10n.text("Automation")).font(.callout)
+            Spacer()
+            Toggle(L10n.text("Automation"), isOn: Binding(get: { model.enabled }, set: actions.setEnabled))
+                .labelsHidden().toggleStyle(.switch).controlSize(.small)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func actionMenu(titleKey: String, action: PermissionAction) -> some View {
         let selected = PermissionKind.allCases.filter { model.policy[$0] == action }
-        let summary = selected.isEmpty ? L10n.text("None")
-            : selected.map { L10n.text($0.rawValue) }.joined(separator: ", ")
-        return HStack {
-            Text(L10n.text(titleKey)).font(.callout)
-            Spacer()
-            Menu {
-                ForEach(PermissionKind.allCases, id: \.self) { kind in
-                    Toggle(isOn: Binding(
-                        get: { model.policy[kind] == action },
-                        set: { actions.setRule(kind, $0 ? action : .ignore) }
-                    )) {
-                        Text(L10n.text(kind.rawValue))
+        let tint = action == .allow ? Color.green : Color.orange
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(L10n.text(titleKey)).font(.callout)
+                Spacer()
+                Menu {
+                    ForEach(PermissionKind.allCases, id: \.self) { kind in
+                        Toggle(isOn: Binding(
+                            get: { model.policy[kind] == action },
+                            set: { actions.setRule(kind, $0 ? action : .ignore) }
+                        )) {
+                            Text(L10n.text(kind.rawValue))
+                        }
+                    }
+                } label: {
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .controlSize(.small)
+                .fixedSize()
+                .accessibilityLabel(L10n.text(titleKey))
+            }
+            if selected.isEmpty {
+                Text(L10n.text("None")).font(.caption2).foregroundStyle(.tertiary)
+            } else {
+                FlowLayout(spacing: 6) {
+                    ForEach(selected, id: \.self) { kind in
+                        Button { actions.setRule(kind, .ignore) } label: {
+                            HStack(spacing: 4) {
+                                Text(L10n.text(kind.rawValue))
+                                Image(systemName: "xmark").font(.system(size: 7, weight: .bold))
+                            }
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(tint)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(tint.opacity(0.12), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(L10n.text(kind.rawValue))
                     }
                 }
-            } label: {
-                Text(summary)
-                    .font(.callout)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .frame(maxWidth: 180, alignment: .trailing)
             }
-            .fixedSize()
-            .frame(maxWidth: 190)
         }
     }
 
@@ -158,7 +175,6 @@ struct PanelView: View {
                 }
             }
         }
-        .padding(.horizontal, 2)
     }
 
     // MARK: Activity
@@ -225,5 +241,33 @@ struct PanelView: View {
         if !model.hasAccessibility { return "Grant Accessibility access to start." }
         if model.state == .sleeping { return "Waiting for your session to become active." }
         return model.policy.hasAutomaticActions ? "Watching for requests that match your rules." : "All requests are ignored. Choose a rule below to start."
+    }
+}
+
+/// A wrapping row of views so selected permission chips can flow across lines.
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? subviews.reduce(0) { $0 + $1.sizeThatFits(.unspecified).width + spacing }
+        var x: CGFloat = 0, y: CGFloat = 0, rowHeight: CGFloat = 0
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x > 0, x + size.width > width { x = 0; y += rowHeight + spacing; rowHeight = 0 }
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+        return CGSize(width: width, height: y + rowHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x = bounds.minX, y = bounds.minY, rowHeight: CGFloat = 0
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x > bounds.minX, x + size.width > bounds.maxX { x = bounds.minX; y += rowHeight + spacing; rowHeight = 0 }
+            subview.place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: .unspecified)
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
     }
 }
