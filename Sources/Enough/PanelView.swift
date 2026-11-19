@@ -43,7 +43,7 @@ struct PanelView: View {
                 actionMenu(titleKey: "Auto allow", action: .allow)
                 actionMenu(titleKey: "Auto deny", action: .deny)
                 Text(L10n.text("Allow grants access. Deny refuses it. Ignore leaves the dialog for you. Rules apply to any app; English system dialogs only."))
-                    .font(.caption2).foregroundStyle(.secondary)
+                    .font(.subheadline).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.vertical, 12)
@@ -75,7 +75,7 @@ struct PanelView: View {
                     accessBadge
                 }
                 Text(L10n.text(statusDescription))
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.subheadline).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 6)
@@ -90,7 +90,7 @@ struct PanelView: View {
     private var accessBadge: some View {
         Label(L10n.text(model.hasAccessibility ? "Accessibility Granted" : "Needs Accessibility"),
               systemImage: model.hasAccessibility ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-            .font(.caption2.weight(.semibold))
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(model.hasAccessibility ? Color.green : Color.orange)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
@@ -132,16 +132,16 @@ struct PanelView: View {
                 .accessibilityLabel(L10n.text(titleKey))
             }
             if selected.isEmpty {
-                Text(L10n.text("None")).font(.caption2).foregroundStyle(.tertiary)
+                Text(L10n.text("None")).font(.subheadline).foregroundStyle(.tertiary)
             } else {
                 FlowLayout(spacing: 6) {
                     ForEach(selected, id: \.self) { kind in
                         Button { actions.setRule(kind, .ignore) } label: {
                             HStack(spacing: 4) {
                                 Text(L10n.text(kind.rawValue))
-                                Image(systemName: "xmark").font(.system(size: 7, weight: .bold))
+                                Image(systemName: "xmark").font(.system(size: 8, weight: .bold))
                             }
-                            .font(.caption2.weight(.medium))
+                            .font(.subheadline.weight(.medium))
                             .foregroundStyle(tint)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 3)
@@ -159,7 +159,7 @@ struct PanelView: View {
     private func actionPickerPanel(titleKey: String, action: PermissionAction) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(L10n.text(titleKey))
-                .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                .font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
                 .padding(.horizontal, 14)
                 .padding(.top, 12)
                 .padding(.bottom, 4)
@@ -183,7 +183,7 @@ struct PanelView: View {
             }
         }
         .padding(.bottom, 10)
-        .frame(width: 248)
+        .frame(width: 258)
     }
 
     private var launchRow: some View {
@@ -211,16 +211,16 @@ struct PanelView: View {
     private var activity: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(L10n.text("Recent activity")).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                Text(L10n.text("Recent activity")).font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
                 Spacer()
                 Button(L10n.text("Open Activity Log"), action: actions.openLog)
                     .buttonStyle(.borderless)
                     .controlSize(.small)
-                    .font(.caption)
+                    .font(.subheadline)
             }
             if model.events.isEmpty {
                 Text(L10n.text("No activity yet"))
-                    .font(.caption).foregroundStyle(.tertiary)
+                    .font(.subheadline).foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 6)
             } else {
@@ -254,11 +254,11 @@ struct PanelView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(event.date, style: .time)
-                        .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        .font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
                     Text(event.app).font(.callout.weight(.medium)).lineLimit(1)
                 }
                 Text("\(L10n.text(event.permission)) · \(L10n.text(event.result))")
-                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    .font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
             }
             .padding(.bottom, isLast ? 0 : 10)
         }
