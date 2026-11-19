@@ -19,9 +19,11 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
         if NSWorkspace.shared.runningApplications.contains(where: {
             $0.bundleIdentifier == Bundle.main.bundleIdentifier && $0.processIdentifier != ProcessInfo.processInfo.processIdentifier
         }) { NSApp.terminate(nil); return }
-        defaults.register(defaults: ["enabled": true])
+        defaults.register(defaults: ["enabled": true, "workWhileLocked": true])
         panel.policy = PermissionPolicy(storedValues: defaults.dictionary(forKey: "permissionActions") as? [String: String] ?? [:])
         panel.events = history.events
+        panel.workWhileLocked = defaults.bool(forKey: "workWhileLocked")
+        engine.workWhileLocked = panel.workWhileLocked
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.target = self
         item.button?.action = #selector(togglePopover(_:))
@@ -91,6 +93,12 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
         defaults.set(panel.policy.storedValues, forKey: "permissionActions")
     }
 
+    private func setWorkWhileLocked(_ value: Bool) {
+        panel.workWhileLocked = value
+        engine.workWhileLocked = value
+        defaults.set(value, forKey: "workWhileLocked")
+    }
+
     private func grantAccess() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
@@ -113,6 +121,7 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
             setEnabled: { [weak self] in self?.setEnabled($0) },
             setRule: { [weak self] in self?.setRule($0, $1) },
             setLaunchAtLogin: { [weak self] in self?.setLaunchAtLogin($0) },
+            setWorkWhileLocked: { [weak self] in self?.setWorkWhileLocked($0) },
             grantAccess: { [weak self] in self?.grantAccess() },
             openLoginSettings: { SMAppService.openSystemSettingsLoginItems() },
             openLog: { [weak self] in self?.openLog() },

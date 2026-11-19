@@ -7,6 +7,7 @@ final class PanelModel: ObservableObject {
     @Published var hasAccessibility = false
     @Published var launchAtLogin = false
     @Published var loginNeedsApproval = false
+    @Published var workWhileLocked = false
     @Published var policy = PermissionPolicy()
     @Published var events: [ApprovalEvent] = []
 }
@@ -15,6 +16,7 @@ struct PanelActions {
     let setEnabled: (Bool) -> Void
     let setRule: (PermissionKind, PermissionAction) -> Void
     let setLaunchAtLogin: (Bool) -> Void
+    let setWorkWhileLocked: (Bool) -> Void
     let grantAccess: () -> Void
     let openLoginSettings: () -> Void
     let openLog: () -> Void
@@ -41,6 +43,7 @@ struct PanelView: View {
             Divider()
             VStack(alignment: .leading, spacing: 10) {
                 launchRow
+                lockRow
                 automationRow
             }
             .padding(.vertical, 12)
@@ -105,6 +108,15 @@ struct PanelView: View {
     }
 
     // MARK: Rules
+
+    private var lockRow: some View {
+        HStack {
+            Text(L10n.text("Work while locked")).font(.callout)
+            Spacer()
+            Toggle(L10n.text("Work while locked"), isOn: Binding(get: { model.workWhileLocked }, set: actions.setWorkWhileLocked))
+                .labelsHidden().toggleStyle(.switch).controlSize(.small)
+        }
+    }
 
     private var automationRow: some View {
         HStack {

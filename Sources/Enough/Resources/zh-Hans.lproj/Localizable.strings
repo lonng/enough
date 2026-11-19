@@ -3,6 +3,7 @@
 "Activity" = "活动记录";
 "Automation" = "自动处理";
 "Launch at Login" = "登录时启动";
+"Work while locked" = "锁屏时仍自动处理";
 "Allow Enough in Login Items to finish setup." = "请在系统登录项中允许 Enough 以完成设置。";
 "Open Login Items" = "打开登录项";
 "Permission rules" = "权限规则";
