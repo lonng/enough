@@ -229,9 +229,10 @@ struct PanelView: View {
         }
     }
 
-    /// One timeline node: a check or cross mark on a shared vertical rail, the time,
-    /// the app, and the permission. The rail runs the full row so consecutive nodes
-    /// connect; it starts at the first mark's center and ends at the last one's.
+    /// One timeline node: a dot on a shared vertical rail, the time, the app, and the
+    /// permission with a trailing check or cross mark. The rail runs the full row so
+    /// consecutive nodes connect; it starts at the first dot's center and ends at the
+    /// last one's.
     private func timelineRow(_ event: ApprovalEvent, isFirst: Bool, isLast: Bool) -> some View {
         HStack(alignment: .top, spacing: 10) {
             ZStack(alignment: .top) {
@@ -239,16 +240,15 @@ struct PanelView: View {
                     Rectangle()
                         .fill(Color.primary.opacity(0.18))
                         .frame(width: 1.5)
-                        .padding(.top, isFirst ? 8 : 0)
-                        .frame(maxHeight: isLast ? 8 : .infinity, alignment: .top)
+                        .padding(.top, isFirst ? 7.5 : 0)
+                        .frame(maxHeight: isLast ? 7.5 : .infinity, alignment: .top)
                 }
-                Image(systemName: event.result == "Clicked Allow" ? "checkmark" : "xmark")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(eventTint(event.result))
-                    .frame(width: 12, height: 12)
-                    .padding(.top, 2)
+                Circle()
+                    .fill(Color.primary.opacity(0.35))
+                    .frame(width: 9, height: 9)
+                    .padding(.top, 3)
             }
-            .frame(width: 12)
+            .frame(width: 9)
             .frame(maxHeight: .infinity, alignment: .top)
             HStack(spacing: 8) {
                 Text(event.date, style: .time)
@@ -259,6 +259,9 @@ struct PanelView: View {
                 Text(L10n.text(event.permission))
                     .font(.subheadline).foregroundColor(.secondary)
                     .lineLimit(1)
+                Image(systemName: event.result == "Clicked Allow" ? "checkmark" : "xmark")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(eventTint(event.result))
             }
             .padding(.vertical, 4)
             .help("\(event.app) · \(L10n.text(event.permission)) · \(L10n.text(event.result))")
