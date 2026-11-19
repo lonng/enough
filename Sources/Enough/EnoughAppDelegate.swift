@@ -116,7 +116,6 @@ final class EnoughAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
             grantAccess: { [weak self] in self?.grantAccess() },
             openLoginSettings: { SMAppService.openSystemSettingsLoginItems() },
             openLog: { [weak self] in self?.openLog() },
-            openGitHub: { NSWorkspace.shared.open(URL(string: "https://github.com/jtc268/enough")!) },
             quit: { NSApp.terminate(nil) }
         )
     }

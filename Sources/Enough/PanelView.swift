@@ -18,7 +18,6 @@ struct PanelActions {
     let grantAccess: () -> Void
     let openLoginSettings: () -> Void
     let openLog: () -> Void
-    let openGitHub: () -> Void
     let quit: () -> Void
 }
 
@@ -212,11 +211,6 @@ struct PanelView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(L10n.text("Recent activity")).font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
-                Spacer()
-                Button(L10n.text("Open Activity Log"), action: actions.openLog)
-                    .buttonStyle(.borderless)
-                    .controlSize(.small)
-                    .font(.subheadline)
             }
             let clicks = model.events.filter { $0.result == "Clicked Allow" || $0.result == "Clicked Don't Allow" }
             if clicks.isEmpty {
@@ -281,9 +275,10 @@ struct PanelView: View {
 
     private var footer: some View {
         HStack {
-            Button("GitHub", action: actions.openGitHub)
+            Button(L10n.text("Open Activity Log"), action: actions.openLog)
                 .buttonStyle(.borderless)
                 .controlSize(.small)
+                .font(.subheadline)
             Spacer()
             Button(action: actions.quit) {
                 Image(systemName: "power")
