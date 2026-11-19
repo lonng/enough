@@ -160,8 +160,9 @@ struct PanelView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(L10n.text(titleKey))
                 .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.bottom, 6)
+                .padding(.horizontal, 14)
+                .padding(.top, 12)
+                .padding(.bottom, 4)
             ForEach(PermissionKind.allCases, id: \.self) { kind in
                 Toggle(isOn: Binding(
                     get: { model.policy[kind] == action },
@@ -177,12 +178,12 @@ struct PanelView: View {
                 }
                 .toggleStyle(.checkbox)
                 .controlSize(.small)
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 14)
                 .padding(.vertical, 4)
             }
         }
-        .padding(.vertical, 8)
-        .frame(width: 240)
+        .padding(.bottom, 10)
+        .frame(width: 248)
     }
 
     private var launchRow: some View {
@@ -223,26 +224,51 @@ struct PanelView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 6)
             } else {
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(Array(model.events.suffix(5).reversed())) { event in
-                        activityRow(event)
+                let latest = Array(model.events.suffix(5).reversed())
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(latest.enumerated()), id: \.element.id) { index, event in
+                        timelineRow(event, isLast: index == latest.count - 1)
                     }
                 }
             }
         }
     }
 
-    private func activityRow(_ event: ApprovalEvent) -> some View {
-        HStack(spacing: 8) {
-            Text(event.app).font(.callout.weight(.medium)).lineLimit(1)
-            Spacer(minLength: 4)
-            Text("\(L10n.text(event.permission)) · \(L10n.text(event.result))")
-                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-            Text(event.date, style: .time)
-                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+    /// One timeline node: a colored dot on a shared vertical rail, the time, then the event.
+    private func timelineRow(_ event: ApprovalEvent, isLast: Bool) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            ZStack(alignment: .top) {
+                if !isLast {
+                    Rectangle()
+                        .fill(Color.primary.opacity(0.18))
+                        .frame(width: 1.5)
+                        .padding(.top, 4)
+                        .frame(maxHeight: .infinity)
+                }
+                Circle()
+                    .fill(eventTint(event.result))
+                    .frame(width: 9, height: 9)
+                    .padding(.top, 3)
+            }
+            .frame(width: 9)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text(event.date, style: .time)
+                        .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    Text(event.app).font(.callout.weight(.medium)).lineLimit(1)
+                }
+                Text("\(L10n.text(event.permission)) · \(L10n.text(event.result))")
+                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            }
+            .padding(.bottom, isLast ? 0 : 10)
         }
         .textSelection(.enabled)
-        .padding(.vertical, 3)
+    }
+
+    private func eventTint(_ result: String) -> Color {
+        if result == "Clicked Allow" { return .green }
+        if result == "Clicked Don't Allow" { return .orange }
+        return .secondary.opacity(0.7)
     }
 
     // MARK: Footer
