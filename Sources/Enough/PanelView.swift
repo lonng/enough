@@ -165,10 +165,12 @@ struct PanelView: View {
     private func actionPickerPanel(titleKey: String, action: PermissionAction) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(L10n.text(titleKey))
-                .font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
-                .padding(.top, 8)
-                .padding(.bottom, 2)
+                .font(.callout.weight(.semibold))
+                .padding(.horizontal, 12)
+                .padding(.top, 10)
+                .padding(.bottom, 6)
+            Divider()
+                .padding(.horizontal, 10)
             ForEach(PermissionKind.allCases, id: \.self) { kind in
                 Toggle(isOn: Binding(
                     get: { model.policy[kind] == action },
@@ -184,7 +186,7 @@ struct PanelView: View {
                 }
                 .toggleStyle(.checkbox)
                 .controlSize(.small)
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 12)
                 .padding(.vertical, 3)
             }
         }
